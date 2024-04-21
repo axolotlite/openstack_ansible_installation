@@ -1,0 +1,27 @@
+---
+- name: "find line"
+  lineinfile:
+    state: absent
+    path: "{{ filepath }}"
+    regexp: "{{ line_key }}"
+  check_mode: true
+  changed_when: false # This just makes things look prettier in the logs
+  register: check
+  #- name: "check if line is commented"
+  #  lineinfile:
+  #    state: absent
+  #    path: "{{ filepath }}"
+  #    regexp: "^#{{ line_key }}"
+  #  check_mode: true
+  #  changed_when: false # This just makes things look prettier in the logs
+  #  when: check.found == 1
+  #  register: commented
+- name: "add line"
+  lineinfile:
+    state: present
+    path: "{{ filepath }}"
+    insertafter: "{{ insert_after }}"
+    line: "{{ line_key }} = {{ line_value}}"
+  when: check.found == 0
+
+

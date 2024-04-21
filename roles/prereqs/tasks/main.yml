@@ -1,0 +1,44 @@
+---
+#this was written to keep ansible idiompotent, which was a pain
+- name: "Configure network settings"
+  replace:
+    path: /etc/hosts
+    regexp: '(?!.*{{hostname}})(127.0.0.1.*)$'
+    replace: '\1 {{hostname}}'
+- name: "Install openstack repo"
+  ansible.builtin.package:
+    name: "centos-release-openstack-yoga"
+    state: present
+- name: "Install required packages"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mariadb
+    - mariadb-server
+    - rabbitmq-server
+    - memcached
+    - python-memcached
+    - chrony
+- name: "Increase mysql max connections"
+  import_role:
+    name: testing
+  vars:
+    filepath: /etc/my.cnf.d/mariadb-server.cnf
+    line_key: "max_connections"
+    insert_after: '\[mysqld\]'
+    regexp: "^{{line_key}}"
+    line_value: "500"
+- name: "Enable the services"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - chronyd
+    - mariadb
+    - rabbitmq-server
+    - memcached
+
+    #- name: "Create mariadb tables and users"
+  

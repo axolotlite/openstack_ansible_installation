@@ -1,0 +1,56 @@
+---
+- name: "Install Placement package"
+  dnf:
+    name: openstack-placement-api
+    enablerepo:
+      - centos-openstack-yoga
+      - crb
+    state: present
+
+- name: "Configure placement ini"
+  include_role:
+    name: append_line
+  vars:
+    filepath: /etc/placement/placement.conf
+    line: "{{ item.1 }}"
+    regexp: "^{{ line }}"
+    insert_after: '^\[{{ item.0.key }}\]'
+  loop: "{{ placement_configs | dict2items | subelements('value') }}"
+- name: "Create placement in openstacl"
+  include_role:
+    name: create_service
+  vars:
+    username: placement
+    userpassword: servicepassword
+    projectname: service
+    servicename: placement
+    servicetype: placement
+    servicedescription: "Openstack Placement Service"
+    endpointurl: "http://controller:8778"
+    serviceregion: "RegionOne"
+- name: "Configure the placement mysql database tables"
+  become: yes
+  become_user: "placement"
+  command: 'placement-manage db sync'
+- name: "Modify httpd"
+  include_role:
+    name: prepend_line
+  vars:
+    filepath: /etc/httpd/conf.d/00-placement-api.conf
+    insertbefore: "<\/VirtualHost>"
+    line: "{{ item }}"
+    regexp: "{{ item }}"
+  with_items:
+    - "  <Directory /usr/bin>"
+    - "    Require all granted"
+    - "  </Directory>"
+
+- name: "Restant httpd service"
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+- name: "Enable and Start placement api"
+  ansible.builtin.service:
+    name: openstack-glance-api
+    state: started
+    enabled: yes

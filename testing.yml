@@ -11,5 +11,6 @@
     OS_IDENTITY_API_VERSION: 3
     OS_IMAGE_API_VERSION: 2
   roles:
-    - role: config_databases
-    - role: keystone
+    #   - role: config_databases
+    #    - role: keystone
+    - role: placement

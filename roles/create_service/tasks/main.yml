@@ -1,0 +1,36 @@
+---
+- name: "Create user"
+  openstack.cloud.identity_user:
+    state: present
+    name: "{{ username }}"
+    password: "{{ userpassword }}"
+    domain: default
+    default_project: "{{ projectname }}"
+
+    #- name: "Create a role"
+    #  openstack.cloud.identity_role:
+    #    state: present
+    #    name: "{{ rolename }}"
+
+- name: "Assign role"
+  openstack.cloud.role_assignment:
+    user: "{{ username }}"
+    role: "admin"
+    project: "{{ projectname }}"
+- name: "Create a service"
+  openstack.cloud.catalog_service:
+     state: present
+     name: "{{ servicename }}"
+     type: "{{ servicetype }}"
+     description: "{{ servicedescription }}"
+- name: "Create glance services"
+  openstack.cloud.endpoint:
+     service: "{{ servicename }}"
+     endpoint_interface: "{{ item }}"
+     url: "{{ endpointurl }}"
+     region: "{{ serviceregion}}"
+     state: present
+  with_items:
+    - public
+    - internal
+    - admin

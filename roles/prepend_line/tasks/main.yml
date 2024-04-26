@@ -1,0 +1,18 @@
+---
+- name: "find line"
+  lineinfile:
+    state: absent
+    path: "{{ filepath }}"
+    regexp: "{{ regexp }}"
+  check_mode: true
+  changed_when: false # This just makes things look prettier in the logs
+  register: check
+- name: "prepend line"
+  lineinfile:
+    state: present
+    path: "{{ filepath }}"
+    insertbefore: "{{ insertbefore }}"
+    line: "{{ line }}"
+  when: check.found == 0
+
+

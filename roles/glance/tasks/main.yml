@@ -1,0 +1,39 @@
+---
+- name: "Install Glance package"
+  dnf:
+    name: openstack-glance
+    enablerepo:
+      - centos-openstack-yoga
+      - crb
+    state: present
+
+- name: "Configure glance ini"
+  include_role:
+    name: append_line
+  vars:
+    filepath: /etc/glance/glance-api.conf
+    line: "{{ item.1 }}"
+    regexp: "^{{ line }}"
+    insert_after: '^\[{{ item.0.key }}\]'
+  loop: "{{ glance_configs | dict2items | subelements('value') }}"
+- name: "Create Glance in openstacl"
+  include_role:
+    name: create_service
+  vars:
+    username: glance
+    userpassword: servicepassword
+    projectname: service
+    servicename: glance
+    servicetype: image
+    servicedescription: "Openstack Image Service"
+    endpointurl: "http://controller:9292"
+    serviceregion: "RegionOne"
+- name: "Configure the Glance mysql database tables"
+  become: yes
+  become_user: "glance"
+  command: 'glance-manage db_sync'
+- name: "Enable and Start glance api"
+  ansible.builtin.service:
+    name: openstack-glance-api
+    state: started
+    enabled: yes

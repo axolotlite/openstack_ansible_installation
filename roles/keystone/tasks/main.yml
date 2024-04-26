@@ -7,6 +7,10 @@
     - openstack-keystone 
     - httpd 
     - mod_wsgi
+- name: "Update openstacksdk package to the latest"
+  pip:
+    name: openstacksdk
+    state: latest
     #- name: Loop over subelements of the dictionary
     #  debug:
     #    msg: "Key={{ item.0.key }} secondary_key={{ item.1 }}"
@@ -51,3 +55,12 @@
   ansible.builtin.service:
     name: httpd
     state: restarted
+- name: "Create the default project"
+  openstack.cloud.project:
+    description: "Service Project"
+    domain: default
+    is_enabled: True
+    name: service
+    extra_specs:
+      internal_alias: service
+    state: present

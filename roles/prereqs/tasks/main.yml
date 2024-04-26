@@ -21,6 +21,7 @@
     - python-memcached
     - chrony
     - python3-pip
+    - python-openstackclient
 - name: "Increase mysql max connections"
   import_role:
     name: add_line

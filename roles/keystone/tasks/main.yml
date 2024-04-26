@@ -1,0 +1,53 @@
+---
+- name: "Install keystone packages"
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-keystone 
+    - httpd 
+    - mod_wsgi
+    #- name: Loop over subelements of the dictionary
+    #  debug:
+    #    msg: "Key={{ item.0.key }} secondary_key={{ item.1 }}"
+    #  loop: "{{ keystone_configs | dict2items | subelements('value') }}"
+
+- name: "Configure keystone ini"
+  include_role:
+    name: append_line
+  vars:
+    filepath: /etc/keystone/keystone.conf
+    line: "{{ item.1 }}"
+    regexp: "^{{ line }}"
+    insert_after: '^\[{{ item.0.key }}\]'
+  loop: "{{ keystone_configs | dict2items | subelements('value') }}"
+- name: "Configure the keystome mysql database tables"
+  become: yes
+  become_user: "keystone"
+  command: 'keystone-manage db_sync'
+- name: "setup fernet credentials"
+  command: 'keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone'
+- name: "setup fernet user"
+  command: 'keystone-manage credential_setup --keystone-user keystone --keystone-group keystone'
+- name: "bootstrap keystone"
+  command: |
+    keystone-manage bootstrap --bootstrap-password adminpassword \
+    --bootstrap-admin-url http://controller:5000/v3/ \
+    --bootstrap-internal-url http://controller:5000/v3/ \
+    --bootstrap-public-url http://controller:5000/v3/ \
+    --bootstrap-region-id RegionOne
+- name: "Configure httpd"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^#ServerName www.example.com:80'
+    replace: 'ServerName controller'
+- name: "Create Symbolic link for httpd"
+  file:
+    src: /usr/share/keystone/wsgi-keystone.conf
+    dest: /etc/httpd/conf.d/wsgi-keystone.conf
+    state: link
+
+- name: "Restart service httpd, in all cases"
+  ansible.builtin.service:
+    name: httpd
+    state: restarted

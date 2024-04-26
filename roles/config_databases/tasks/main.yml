@@ -31,9 +31,9 @@
     login_password: root
     state: present
     name: "{{item}}"
+    host: "localhost"
     password: "password"
-    priv:
-      "{{item}}.*": 'ALL,GRANT'
+    priv: "{{item}}.*: ALL,GRANT"
   with_items:
       - keystone
       - glance
@@ -46,10 +46,9 @@
     login_password: root
     state: present
     name: "{{item}}"
-    host_all: true
+    host: "%"
     password: "password"
-    priv:
-      "{{item}}.*": 'ALL,GRANT'
+    priv: "{{item}}.*: ALL,GRANT"
   with_items:
       - keystone
       - glance
@@ -62,11 +61,13 @@
     login_password: root
     state: present
     name: "nova"
-    host_all: true
+    host: "localhost"
+    host: "%"
     password: "password"
-    priv:
-      "nova_api.*": 'ALL,GRANT'
-      "nova_cell0.*": 'ALL,GRANT'
+    priv: "{{ item }}.*: ALL,GRANT"
+  with_items:
+    - nova_api
+    - nova_cell
 - name: "configure rabbitMQ"
   community.rabbitmq.rabbitmq_user:
     user: openstack

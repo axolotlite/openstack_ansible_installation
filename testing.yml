@@ -1,5 +1,6 @@
 ---
-- name: "config_mariadb"
+- name: "keystone"
   hosts: servers
   roles:
     - role: config_databases
+    - role: keystone

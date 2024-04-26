@@ -1,0 +1,93 @@
+---
+- name: "Install pymysql"
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - pymysql
+    - requests
+- name: "Copy database dump file"
+  copy:
+    src: init_db.sql
+    dest: /tmp
+- name: "create database"
+  community.mysql.mysql_db:
+    name: "{{ item }}"
+    login_user: root
+    login_password: root
+    state: present
+  with_items:
+      - keystone
+      - glance
+      - placement
+      - nova
+      - nova_api
+      - nova_cell0
+      - neutron
+
+- name: "grant database priviliges"
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: root
+    state: present
+    name: "{{item}}"
+    password: "password"
+    priv:
+      "{{item}}.*": 'ALL,GRANT'
+  with_items:
+      - keystone
+      - glance
+      - placement
+      - nova
+      - neutron
+- name: "grant database priviliges"
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: root
+    state: present
+    name: "{{item}}"
+    host_all: true
+    password: "password"
+    priv:
+      "{{item}}.*": 'ALL,GRANT'
+  with_items:
+      - keystone
+      - glance
+      - placement
+      - nova
+      - neutron
+- name: "grant additional nova privileges"
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: root
+    state: present
+    name: "nova"
+    host_all: true
+    password: "password"
+    priv:
+      "nova_api.*": 'ALL,GRANT'
+      "nova_cell0.*": 'ALL,GRANT'
+- name: "configure rabbitMQ"
+  community.rabbitmq.rabbitmq_user:
+    user: openstack
+    password: password
+    login_port: 25672
+    node: "rabbit@controller"
+    permissions:
+      - vhost: /
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+    state: present
+- name: "Configure memcached"
+  ansible.builtin.replace:
+    path: /etc/sysconfig/memcached
+    regexp: '127.0.0.1'
+    replace: '0.0.0.0'
+    #- name: "shell command"
+    #  shell: "mysql < /tmp/init_db.sql"
+    #- name: "Restore database"
+    #  community.mysql.mysql_db:
+    #    name: my_db
+    #    state: import
+    #    target: /tmp/init_db.sql

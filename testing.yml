@@ -1,0 +1,5 @@
+---
+- name: "config_mariadb"
+  hosts: servers
+  roles:
+    - role: config_databases

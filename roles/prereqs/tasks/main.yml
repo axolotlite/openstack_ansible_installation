@@ -20,9 +20,10 @@
     - memcached
     - python-memcached
     - chrony
+    - python3-pip
 - name: "Increase mysql max connections"
   import_role:
-    name: testing
+    name: add_line
   vars:
     filepath: /etc/my.cnf.d/mariadb-server.cnf
     line_key: "max_connections"
@@ -39,6 +40,3 @@
     - mariadb
     - rabbitmq-server
     - memcached
-
-    #- name: "Create mariadb tables and users"
-  

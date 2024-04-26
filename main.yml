@@ -1,16 +1,8 @@
 ---
-- name: "test isolated function"
-  hosts: servers
-  roles:
-    - role: testing
-      filepath: /etc/my.cnf.d/mariadb-server.cnf
-      line_key: "max_connections"
-      insert_after: '\[mysqld\]'
-      regexp: "^{{line_key}}"
-      line_value: "500"
-      tags: testing
 - name: "prereqs"
   hosts: servers
   roles:
     - role: prereqs
       tags: ["prereqs", "core"]
+    - role: config_databases
+      tags: ["prereqs", "core", "database"]

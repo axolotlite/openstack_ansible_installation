@@ -13,5 +13,6 @@
   roles:
     #- role: config_databases
     #    - role: keystone
-    - test_append
+    #- test_append
     #- role: nova
+    - role: neutron

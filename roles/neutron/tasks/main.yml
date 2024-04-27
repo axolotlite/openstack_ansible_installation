@@ -1,0 +1,80 @@
+---
+- name: "Install neutron package and its depedencies"
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-neutron 
+    - openstack-neutron-ml2 
+    - openstack-neutron-linuxbridge 
+    - ebtables 
+    - ipset
+
+- name: "Configure neutron ini"
+  include_role:
+    name: append_block
+  vars:
+    filepath: "{{ outer_item.0 }}"
+    component_configs: "{{ outer_item.1 }}"
+  loop:
+    - ["/etc/neutron/neutron.conf", "{{ neutron_configs }}"]
+    - ["/etc/neutron/plugins/ml2/ml2_conf.ini", "{{ ml2_configs }}"]
+    - ["/etc/neutron/plugins/ml2/linuxbridge_agent.ini", "{{ linuxbridge_configs  }}"]
+    - ["/etc/neutron/l3_agent.ini","{{ l3_agent_configs }}"]
+    - ["/etc/neutron/dhcp_agent.ini", "{{ dhcp_agent_configs }}"]
+    - ["/etc/neutron/metadata_agent.ini", "{{ metadata_agent_configs }}"]
+    - ["/etc/nova/nova.conf", "{{ nova_configs }}"]
+  loop_control:
+    loop_var: outer_item
+- name: "Add the br_netfilter module"
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+- name: "Apply settings"
+  command: "sysctl -p"
+
+- name: "Create neutron in openstack"
+  include_role:
+    name: create_service
+  vars:
+    username: neutron
+    userpassword: servicepassword
+    projectname: service
+    servicename: neutron
+    servicetype: network
+    servicedescription: "Openstack networking Service"
+    endpointurl: "http://controller:9696"
+    serviceregion: "RegionOne"
+- name: "Create Symbolic link for httpd"
+  file:
+    src: /etc/neutron/plugins/ml2/ml2_conf.ini
+    dest: /etc/neutron/plugin.ini
+    state: link
+- name: "Configure the neutron mysql database tables"
+  become: yes
+  become_user: "neutron"
+  command: "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head"
+- name: "Restart nova api"
+  ansible.builtin.service:
+    name: "openstack-nova-api"
+    state: restarted
+- name: "Enable and Start neutron and its dependencies"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - neutron-l3-agent
+    - neutron-server
+    - neutron-linuxbridge-agent
+    - neutron-dhcp-agent
+    - neutron-metadata-agent
+- name: "enable and start nova compute"
+  ansible.builtin.service:
+    name: "openstack-nova-compute"
+    state: started
+    enabled: yes
+- name: "Add this node to the compute nodes"
+  become: yes
+  become_user: "nova"
+  command: "nova-manage cell_v2 discover_hosts"

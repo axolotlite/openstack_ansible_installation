@@ -1,0 +1,53 @@
+---
+- name: "Install nova package and its depedencies"
+  dnf:
+    name: "{{ item }}"
+    enablerepo:
+      - centos-openstack-yoga
+      - crb
+    state: present
+  with_items:
+    - openstack-nova
+    - qemu-kvm
+    - libvirt
+    - virt-install
+
+- name: "Configure nova ini"
+  include_role:
+    name: append_block
+  vars:
+    filepath: /etc/nova/nova.conf
+    component_configs: "{{ nova_configs }}"
+- name: "Create nova in openstack"
+  include_role:
+    name: create_service
+  vars:
+    username: nova
+    userpassword: servicepassword
+    projectname: service
+    servicename: nova
+    servicetype: compute
+    servicedescription: "Openstack Nova Service"
+    endpointurl: "http://controller:8774/v2.1"
+    serviceregion: "RegionOne"
+- name: "Configure the nova mysql database tables"
+  become: yes
+  become_user: "nova"
+  command: "{{ item }}"
+  with_items:
+    - "nova-manage api_db sync"
+    - "nova-manage cell_v2 map_cell0"
+    - "nova-manage cell_v2 create_cell --name=cell1"
+    - "nova-manage db sync"
+
+- name: "Enable and Start nova and its dependencies"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - libvirtd
+    - openstack-nova-api
+    - openstack-nova-conductor
+    - openstack-nova-scheduler
+    - openstack-nova-novncproxy

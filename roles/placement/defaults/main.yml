@@ -1,17 +1,17 @@
 placement_configs:
-  api:
-    - auth_strategy = keystone
-  DEFAULT:
-    - debug = false
-  keystone_authtoken:
-    - www_authenticate_uri = http://controller:5000
-    - auth_url = http://controller:5000
-    - memcached_servers = controller:11211
-    - auth_type = password
-    - project_domain_name = default
-    - user_domain_name = default
-    - project_name = service
-    - username = glance
-    - password = servicepassword
-  placement_database:
-    - connection = mysql+pymysql://placement:password@controller/placement
+  api: |
+      auth_strategy = keystone
+  DEFAULT: |
+      debug = false
+  keystone_authtoken: |
+      www_authenticate_uri = http://controller:5000
+      auth_url = http://controller:5000
+      memcached_servers = controller:11211
+      auth_type = password
+      project_domain_name = default
+      user_domain_name = default
+      project_name = service
+      username = placement
+      password = servicepassword
+  placement_database: |
+      connection = mysql+pymysql://placement:password@controller/placement

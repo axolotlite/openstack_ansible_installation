@@ -9,14 +9,11 @@
 
 - name: "Configure placement ini"
   include_role:
-    name: append_line
+    name: append_block
   vars:
     filepath: /etc/placement/placement.conf
-    line: "{{ item.1 }}"
-    regexp: "^{{ line }}"
-    insert_after: '^\[{{ item.0.key }}\]'
-  loop: "{{ placement_configs | dict2items | subelements('value') }}"
-- name: "Create placement in openstacl"
+    component_configs: "{{ placement_configs }}"
+- name: "Create placement in openstack"
   include_role:
     name: create_service
   vars:

@@ -18,13 +18,10 @@
 
 - name: "Configure keystone ini"
   include_role:
-    name: append_line
+    name: append_block
   vars:
     filepath: /etc/keystone/keystone.conf
-    line: "{{ item.1 }}"
-    regexp: "^{{ line }}"
-    insert_after: '^\[{{ item.0.key }}\]'
-  loop: "{{ keystone_configs | dict2items | subelements('value') }}"
+    component_configs: "{{ keystone_configs }}"
 - name: "Configure the keystome mysql database tables"
   become: yes
   become_user: "keystone"

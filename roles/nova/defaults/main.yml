@@ -1,0 +1,45 @@
+nova_configs:
+  api: |
+    auth_strategy = keystone
+  DEFAULT: |
+    osapi_compute_listen = 127.0.0.1
+    osapi_compute_listen_port = 8774
+    metadata_listen = 127.0.0.1
+    metadata_listen_port = 8775
+    state_path = /var/lib/nova
+    enabled_apis = osapi_compute,metadata
+    log_dir = /var/log/nova
+    transport_url = rabbit://openstack:password@controller
+    compute_driver = libvirt.LibvirtDriver
+  vnc: |
+    enabled = True
+    novncproxy_host = 127.0.0.1
+    novncproxy_port = 6080
+    novncproxy_base_url = http://controller:6080/vnc_auto.html
+  glance: |
+    api_servers = http://controller:9292
+  oslo_concurrency: |
+    lock_path = $state_path/tmp
+  api_database: |
+    connection = mysql+pymysql://nova:password@controller/nova_api
+  database: |
+    connection = mysql+pymysql://nova:password@controller/nova
+  keystone_authtoken: |
+    www_authenticate_uri = http://controller:5000
+    auth_url = http://controller:5000
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    project_name = service
+    username = nova
+    password = servicepassword
+  placement: |
+    auth_url = http://controller:5000
+    os_region_name = RegionOne
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    project_name = service
+    username = placement
+    password = servicepassword

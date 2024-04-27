@@ -34,6 +34,7 @@
     host: "localhost"
     password: "password"
     priv: "{{item}}.*: ALL,GRANT"
+    append_privs: true
   with_items:
       - keystone
       - glance
@@ -49,6 +50,7 @@
     host: "%"
     password: "password"
     priv: "{{item}}.*: ALL,GRANT"
+    append_privs: true
   with_items:
       - keystone
       - glance
@@ -62,12 +64,25 @@
     state: present
     name: "nova"
     host: "localhost"
+    password: "password"
+    priv: "{{ item }}.*: ALL,GRANT"
+    append_privs: true
+  with_items:
+    - nova_api
+    - nova_cell0
+- name: "grant additional nova privileges"
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: root
+    state: present
+    name: "nova"
     host: "%"
     password: "password"
     priv: "{{ item }}.*: ALL,GRANT"
+    append_privs: true
   with_items:
     - nova_api
-    - nova_cell
+    - nova_cell0
 - name: "configure rabbitMQ"
   community.rabbitmq.rabbitmq_user:
     user: openstack

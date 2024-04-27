@@ -9,13 +9,10 @@
 
 - name: "Configure glance ini"
   include_role:
-    name: append_line
+    name: append_block
   vars:
     filepath: /etc/glance/glance-api.conf
-    line: "{{ item.1 }}"
-    regexp: "^{{ line }}"
-    insert_after: '^\[{{ item.0.key }}\]'
-  loop: "{{ glance_configs | dict2items | subelements('value') }}"
+    component_configs: "{{ glance_configs }}"
 - name: "Create Glance in openstacl"
   include_role:
     name: create_service

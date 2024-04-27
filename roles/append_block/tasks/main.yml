@@ -1,0 +1,9 @@
+---
+- name: "Append ini file configuration"
+  blockinfile:
+    state: present
+    marker: "# {mark} Ansible managed {{item.key}} block"
+    path: "{{ filepath }}"
+    insertafter: '^\[{{ item.key }}\]'
+    block: "{{ item.value}}"
+  loop: "{{ component_configs | dict2items }}"

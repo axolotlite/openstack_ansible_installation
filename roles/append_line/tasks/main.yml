@@ -3,6 +3,7 @@
   lineinfile:
     state: absent
     path: "{{ filepath }}"
+    insertafter: "{{ insert_after }}"
     regexp: "{{ regexp }}"
   check_mode: true
   changed_when: false # This just makes things look prettier in the logs

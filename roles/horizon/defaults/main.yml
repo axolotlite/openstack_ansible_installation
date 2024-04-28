@@ -1,0 +1,14 @@
+web_configs: |
+  WEBROOT = '/dashboard/'
+  LOGIN_URL = '/dashboard/auth/login/'
+  LOGOUT_URL = '/dashboard/auth/logout/'
+  LOGIN_REDIRECT_URL = '/dashboard/'
+  OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+  OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = 'Default'
+cache_configs: |
+  CACHES = {
+      'default': {
+          'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+          'LOCATION': 'controller:11211',
+      },
+  }

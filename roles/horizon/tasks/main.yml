@@ -1,0 +1,50 @@
+---
+- name: "Install Horizone Dashboard"
+  dnf:
+    name: openstack-dashboard
+    enablerepo:
+      - centos-openstack-yoga
+      - crb
+    state: present
+- name: "configure the dashboard settings"
+  replace:
+    path: /etc/openstack-dashboard/local_settings
+    regexp: '{{ item.0 }}'
+    replace: '{{ item.1 }}'
+  loop:
+    - ["ALLOWED_HOSTS.*", "ALLOWED_HOSTS = ['*']"]
+    - ["127.0.0.1:11211", "controller:11211"]
+    - ["#SESSION_ENGINE.*", 'SESSION_ENGINE="django.contrib.sessions.backends.cache"']
+    - ["^OPENSTACK_KEYSTONE_URL.*", 'OPENSTACK_KEYSTONE_URL="http://controller:5000/v3"']
+- name: "append cache configs block at the end"
+  blockinfile:
+    path: /etc/openstack-dashboard/local_settings
+    append_newline: true
+    marker: "# {mark} ANSIBLE CACHE CONFIG MANAGED BLOCK"
+    block: "{{ cache_configs }}"
+- name: "append web config block at the end"
+  blockinfile:
+    path: /etc/openstack-dashboard/local_settings
+    append_newline: true
+    marker: "# {mark} ANSIBLE WEB CONFIG MANAGED BLOCK"
+    block: "{{ web_configs }}"
+- name: "append line to the dashboard httpd settings"
+  include_role:
+    name: append_line
+  vars:
+    filepath: /etc/httpd/conf.d/openstack-dashboard.conf
+    insert_after: "WSGISocketPrefix"
+    regexp: "{{ line }}"
+    line: "WSGIApplicationGroup %{GLOBAL}"
+- name: "configure the dashboard httpd settings"
+  replace:
+    path: /etc/httpd/conf.d/openstack-dashboard.conf
+    regexp: '{{ item.0 }}'
+    replace: '{{ item.1 }}'
+  loop:
+    - ['\/django\.wsgi', '.py']
+    - ["wsgi>", ">"]
+- name: "Restant httpd service"
+  ansible.builtin.service:
+    name: httpd
+    state: restarted

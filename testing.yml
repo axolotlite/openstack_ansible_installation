@@ -1,5 +1,5 @@
 ---
-- name: "keystone"
+- name: "testing role"
   hosts: servers
   environment:
     OS_PROJECT_DOMAIN_NAME: default
@@ -15,4 +15,5 @@
     #    - role: keystone
     #- test_append
     #- role: nova
-    - role: neutron
+    #- role: neutron
+    - role: horizon

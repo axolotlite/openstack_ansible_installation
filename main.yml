@@ -22,4 +22,8 @@
     - role: placement
       tags: ["core", "placement"]
     - role: nova
-      tags: ["core", "placement"]
+      tags: ["core", "nova"]
+    - role: neutron
+      tags: ["core", "neutron"]
+    - role: horizon
+      tags: ["horizon", "dashboard"]

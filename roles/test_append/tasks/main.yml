@@ -1,7 +1,0 @@
----
-- name: "Configure keystone ini"
-  include_role:
-    name: append_block
-  vars:
-    filepath: /etc/nova/nova.conf
-    component_configs: "{{ nova_configs }}"

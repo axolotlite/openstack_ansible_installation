@@ -6,10 +6,6 @@
   with_items:
     - pymysql
     - requests
-- name: "Copy database dump file"
-  copy:
-    src: init_db.sql
-    dest: /tmp
 - name: "create database"
   community.mysql.mysql_db:
     name: "{{ item }}"

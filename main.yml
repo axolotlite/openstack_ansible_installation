@@ -13,6 +13,8 @@
   roles:
     - role: prereqs
       tags: ["prereqs", "core"]
+      vars:
+        hostname: controller_node
     - role: config_databases
       tags: ["prereqs", "core", "database"]
     - role: keystone

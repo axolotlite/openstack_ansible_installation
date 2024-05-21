@@ -6,11 +6,29 @@
   with_items:
     - pymysql
     - requests
+- name: "check if we can login as root"
+  mysql_db:
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+    name: information_schema
+    state: present
+  register: login_check
+  ignore_errors: yes
+- name: "update mysql root password for root account"
+  mysql_user:
+    name: root
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    host: 'localhost'
+    password: "{{ mysql_root_password }}"
+    priv: "*.*:ALL,GRANT"
+    check_implicit_admin: true
+  when: login_check.failed
+
 - name: "create database"
   community.mysql.mysql_db:
     name: "{{ item }}"
     login_user: root
-    login_password: root
+    login_password: "{{ mysql_root_password }}"
     state: present
   with_items:
       - keystone
@@ -20,47 +38,46 @@
       - nova_api
       - nova_cell0
       - neutron
-
 - name: "grant database priviliges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: root
+    login_password: "{{ mysql_root_password }}"
     state: present
-    name: "{{item}}"
+    name: "{{item[0]}}"
     host: "localhost"
-    password: "password"
-    priv: "{{item}}.*: ALL,GRANT"
+    password: "{{item[1]}}"
+    priv: "{{item[0]}}.*: ALL,GRANT"
     append_privs: true
-  with_items:
-      - keystone
-      - glance
-      - placement
-      - nova
-      - neutron
+  loop:
+      - ["keystone","{{keystone_db_pass}}"]
+      - ["glance","{{glance_db_pass}}"]
+      - ["placement","{{placement_db_pass}}"]
+      - ["nova","{{nova_db_pass}}"]
+      - ["neutron","{{neutron_db_pass}}"]
 - name: "grant database priviliges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: root
+    login_password: "{{ mysql_root_password }}"
     state: present
-    name: "{{item}}"
+    name: "{{item[0]}}"
     host: "%"
-    password: "password"
-    priv: "{{item}}.*: ALL,GRANT"
+    password: "{{item[1]}}"
+    priv: "{{item[0]}}.*: ALL,GRANT"
     append_privs: true
-  with_items:
-      - keystone
-      - glance
-      - placement
-      - nova
-      - neutron
+  loop:
+      - ["keystone","{{keystone_db_pass}}"]
+      - ["glance","{{glance_db_pass}}"]
+      - ["placement","{{placement_db_pass}}"]
+      - ["nova","{{nova_db_pass}}"]
+      - ["neutron","{{neutron_db_pass}}"]
 - name: "grant additional nova privileges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: root
+    login_password: "{{ mysql_root_password }}"
     state: present
     name: "nova"
     host: "localhost"
-    password: "password"
+    password: "{{nova_db_pass}}"
     priv: "{{ item }}.*: ALL,GRANT"
     append_privs: true
   with_items:
@@ -69,11 +86,11 @@
 - name: "grant additional nova privileges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: root
+    login_password: "{{ mysql_root_password }}"
     state: present
     name: "nova"
     host: "%"
-    password: "password"
+    password: "{{nova_db_pass}}"
     priv: "{{ item }}.*: ALL,GRANT"
     append_privs: true
   with_items:
@@ -82,9 +99,9 @@
 - name: "configure rabbitMQ"
   community.rabbitmq.rabbitmq_user:
     user: openstack
-    password: password
+    password: "{{rabbitmq_db_pass}}"
     login_port: 25672
-    node: "rabbit@controller"
+    node: "rabbit@{{controller_hostname}}"
     permissions:
       - vhost: /
         configure_priv: .*

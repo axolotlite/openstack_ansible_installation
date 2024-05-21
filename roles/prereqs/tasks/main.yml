@@ -3,8 +3,8 @@
 - name: "Configure network settings"
   replace:
     path: /etc/hosts
-    regexp: '(?!.*{{hostname}})(127.0.0.1.*)$'
-    replace: '\1 {{hostname}}'
+    regexp: '(?!.*{{controller_hostname}})(127.0.0.1.*)$'
+    replace: '\1 {{controller_hostname}}'
 - name: "Install openstack repo"
   ansible.builtin.package:
     name: "centos-release-openstack-yoga"

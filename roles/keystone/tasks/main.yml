@@ -32,16 +32,16 @@
   command: 'keystone-manage credential_setup --keystone-user keystone --keystone-group keystone'
 - name: "bootstrap keystone"
   command: |
-    keystone-manage bootstrap --bootstrap-password adminpassword \
-    --bootstrap-admin-url http://controller:5000/v3/ \
-    --bootstrap-internal-url http://controller:5000/v3/ \
-    --bootstrap-public-url http://controller:5000/v3/ \
+    keystone-manage bootstrap --bootstrap-password {{keystone_admin_password}} \
+    --bootstrap-admin-url http://{{controller_hostname}}:5000/v3/ \
+    --bootstrap-internal-url http://{{controller_hostname}}:5000/v3/ \
+    --bootstrap-public-url http://{{controller_hostname}}:5000/v3/ \
     --bootstrap-region-id RegionOne
 - name: "Configure httpd"
   replace:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^#ServerName www.example.com:80'
-    replace: 'ServerName controller'
+    replace: "ServerName {{controller_hostname}}"
 - name: "Create Symbolic link for httpd"
   file:
     src: /usr/share/keystone/wsgi-keystone.conf

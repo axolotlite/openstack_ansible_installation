@@ -1,5 +1,8 @@
 ---
 #this was written to keep ansible idiompotent, which was a pain
+- name: "update hostnames"
+  hostname:
+    name: "{{ controller_hostname  }}"
 - name: "Configure network settings"
   replace:
     path: /etc/hosts

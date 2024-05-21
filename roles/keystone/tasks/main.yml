@@ -22,7 +22,7 @@
   vars:
     filepath: /etc/keystone/keystone.conf
     component_configs: "{{ keystone_configs }}"
-- name: "Configure the keystome mysql database tables"
+- name: "Configure the keystone mysql database tables"
   become: yes
   become_user: "keystone"
   command: 'keystone-manage db_sync'

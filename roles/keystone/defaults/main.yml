@@ -2,6 +2,6 @@ keystone_configs:
   cache: |
     memcache_servers = "{{controller_hostname}}:11211"
   database: |
-    connection = "mysql+pymysql://keystone:{{keystone_db_pass}}d@{{controller_hostname}}/keystone"
+    connection = "mysql+pymysql://keystone:{{keystone_db_pass}}@{{controller_hostname}}/keystone"
   token: |
     provider = "fernet"

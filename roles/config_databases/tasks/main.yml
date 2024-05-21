@@ -9,7 +9,7 @@
 - name: "check if we can login as root"
   mysql_db:
     login_user: root
-    login_password: "{{mysql_root_password}}"
+    login_password: "{{mysql_root_pass}}"
     name: information_schema
     state: present
   register: login_check
@@ -19,7 +19,7 @@
     name: root
     login_unix_socket: /var/lib/mysql/mysql.sock
     host: 'localhost'
-    password: "{{ mysql_root_password }}"
+    password: "{{ mysql_root_pass }}"
     priv: "*.*:ALL,GRANT"
     check_implicit_admin: true
   when: login_check.failed
@@ -28,7 +28,7 @@
   community.mysql.mysql_db:
     name: "{{ item }}"
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ mysql_root_pass }}"
     state: present
   with_items:
       - keystone
@@ -41,7 +41,7 @@
 - name: "grant database priviliges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ mysql_root_pass }}"
     state: present
     name: "{{item[0]}}"
     host: "localhost"
@@ -57,7 +57,7 @@
 - name: "grant database priviliges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ mysql_root_pass }}"
     state: present
     name: "{{item[0]}}"
     host: "%"
@@ -73,7 +73,7 @@
 - name: "grant additional nova privileges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ mysql_root_pass }}"
     state: present
     name: "nova"
     host: "localhost"
@@ -86,7 +86,7 @@
 - name: "grant additional nova privileges"
   community.mysql.mysql_user:
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ mysql_root_pass }}"
     state: present
     name: "nova"
     host: "%"

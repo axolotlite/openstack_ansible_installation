@@ -9,6 +9,6 @@ cache_configs: |
   CACHES = {
       'default': {
           'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-          'LOCATION': 'controller:11211',
+          'LOCATION': "{{controller_hostname}}:11211",
       },
   }

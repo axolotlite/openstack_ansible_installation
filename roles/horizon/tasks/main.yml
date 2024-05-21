@@ -13,9 +13,9 @@
     replace: '{{ item.1 }}'
   loop:
     - ["ALLOWED_HOSTS.*", "ALLOWED_HOSTS = ['*']"]
-    - ["127.0.0.1:11211", "controller:11211"]
+    - ["127.0.0.1:11211", "{{controller_hostname}}:11211"]
     - ["#SESSION_ENGINE.*", 'SESSION_ENGINE="django.contrib.sessions.backends.cache"']
-    - ["^OPENSTACK_KEYSTONE_URL.*", 'OPENSTACK_KEYSTONE_URL="http://controller:5000/v3"']
+    - ["^OPENSTACK_KEYSTONE_URL.*", 'OPENSTACK_KEYSTONE_URL="http://{{controller_hostname}}:5000/v3"']
 - name: "append cache configs block at the end"
   blockinfile:
     path: /etc/openstack-dashboard/local_settings

@@ -32,7 +32,7 @@
   command: 'keystone-manage credential_setup --keystone-user keystone --keystone-group keystone'
 - name: "bootstrap keystone"
   command: |
-    keystone-manage bootstrap --bootstrap-password {{keystone_admin_password}} \
+    keystone-manage bootstrap --bootstrap-password {{keystone_admin_pass}} \
     --bootstrap-admin-url http://{{controller_hostname}}:5000/v3/ \
     --bootstrap-internal-url http://{{controller_hostname}}:5000/v3/ \
     --bootstrap-public-url http://{{controller_hostname}}:5000/v3/ \

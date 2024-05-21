@@ -18,12 +18,12 @@
     name: create_service
   vars:
     username: glance
-    userpassword: servicepassword
+    userpassword: "{{glance_pass}}"
     projectname: service
     servicename: glance
     servicetype: image
     servicedescription: "Openstack Image Service"
-    endpointurl: "http://controller:9292"
+    endpointurl: "http://{{controller_hostname}}:9292"
     serviceregion: "RegionOne"
 - name: "Configure the Glance mysql database tables"
   become: yes

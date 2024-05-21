@@ -18,12 +18,12 @@
     name: create_service
   vars:
     username: placement
-    userpassword: servicepassword
+    userpassword: "{{placement_pass}}"
     projectname: service
     servicename: placement
     servicetype: placement
     servicedescription: "Openstack Placement Service"
-    endpointurl: "http://controller:8778"
+    endpointurl: "http://{{controller_hostname}}:8778"
     serviceregion: "RegionOne"
 - name: "Configure the placement mysql database tables"
   become: yes

@@ -9,7 +9,7 @@ nova_configs:
     state_path = /var/lib/nova
     enabled_apis = osapi_compute,metadata
     log_dir = /var/log/nova
-    transport_url = "rabbit://openstack:rabbitmq_db_pass}}@{{controller_hostname}}"
+    transport_url = "rabbit://openstack:{{rabbitmq_db_pass}}@{{controller_hostname}}"
     compute_driver = libvirt.LibvirtDriver
   vnc: |
     enabled = True

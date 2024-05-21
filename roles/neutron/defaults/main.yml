@@ -3,33 +3,33 @@ neutron_configs:
     core_plugin = ml2
     service_plugins = router
     allow_overlapping_ips = true
-    transport_url = rabbit://openstack:password@controller
+    transport_url = "rabbit://openstack:{{rabbitmq_db_pass}}@{{controller_hostname}}"
     auth_strategy = keystone
     notify_nova_on_port_status_changes = true
     notify_nova_on_port_data_changes = true
   nova: |
-    auth_url = http://controller:5000
+    auth_url = "http://{{controller_hostname}}:5000"
     auth_type = password
     project_domain_name = default
     user_domain_name = default
     region_name = RegionOne
     project_name = service
     username = nova
-    password = servicepassword
+    password = "{{nova_pass}}"
   oslo_concurrency: |
     lock_path = /var/lib/neutron/tmp
   database: |
-    connection = mysql+pymysql://neutron:password@controller/neutron
+    connection = "mysql+pymysql://neutron:{{neutron_db_pass}}@{{controller_hostname}}/neutron"
   keystone_authtoken: |
-    www_authenticate_uri = http://controller:5000
-    auth_url = http://controller:5000
-    memcached_servers = controller:11211
+    www_authenticate_uri = "http://{{controller_hostname}}:5000"
+    auth_url = "http://{{controller_hostname}}:5000"
+    memcached_servers = "{{controller_hostname}}:11211"
     auth_type = password
     project_domain_name = default
     user_domain_name = default
     project_name = service
     username = neutron
-    password = servicepassword
+    password = "{{neutron_pass}}"
 
 ml2_configs:
   ml2: |
@@ -46,10 +46,10 @@ ml2_configs:
 
 linuxbridge_configs:
   linux_bridge: |
-    physical_interface_mappings = provider:enp9s0
+    physical_interface_mappings = "provider:{{interface_name}}"
   vxlan: |
     enable_vxlan = true
-    local_ip = 10.10.10.147
+    local_ip = "{{controller_ip}}"
     l2_population = true
   securitygroup: |
     enable_security_group = true
@@ -67,18 +67,18 @@ dhcp_agent_configs:
 
 metadata_agent_configs:
   DEFAULT: |
-    nova_metadata_host = controller
+    nova_metadata_host = "{{controller_hostname}}"
     metadata_proxy_shared_secret = secret
 
 nova_configs:
   neutron: |
-    auth_url = http://controller:5000
+    auth_url = "http://{{controller_hostname}}:5000"
     auth_type = password
     project_domain_name = default
     user_domain_name = default
     region_name = RegionOne
     project_name = service
     username = neutron
-    password = servicepassword
+    password = "{{neutron_pass}}"
     service_metadata_proxy = true
     metadata_proxy_shared_secret = secret

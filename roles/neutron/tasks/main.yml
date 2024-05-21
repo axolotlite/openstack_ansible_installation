@@ -38,12 +38,12 @@
     name: create_service
   vars:
     username: neutron
-    userpassword: servicepassword
+    userpassword: "{{neutron_pass}}"
     projectname: service
     servicename: neutron
     servicetype: network
     servicedescription: "Openstack networking Service"
-    endpointurl: "http://controller:9696"
+    endpointurl: "http://{{controller_hostname}}:9696"
     serviceregion: "RegionOne"
 - name: "Create Symbolic link for httpd"
   file:

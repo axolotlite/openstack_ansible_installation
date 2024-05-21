@@ -2,7 +2,7 @@
 
 This project is a proof of concept, I've manually installed Openstack, wrote some scripts to automatically install it and finally, I've poured this experience into applying those script into Ansible modules in their respective roles to automate a basic install of Openstack.
 
-This installation script currently hard-codes most of the process, however it should be easy to convert to variables since I've written some modular roles(aside from the horizon role).
+This installation script uses variables defined in the inventory file, before running the project go into the inventory file, define the controller node, interface name and controller ip address.
 
 ### Directory overview
 
@@ -52,19 +52,19 @@ placement_configs:
   DEFAULT: |
       debug = false
   keystone_authtoken: |
-      www_authenticate_uri = http://controller:5000
-      auth_url = http://controller:5000
-      memcached_servers = controller:11211
+      www_authenticate_uri = "http://{{controller_hostname}}:5000"
+      auth_url = "http://{{controller_hostname}}:5000"
+      memcached_servers = "{{controller_hostname}}:11211"
       auth_type = password
       project_domain_name = default
       user_domain_name = default
       project_name = service
       username = placement
-      password = servicepassword
+      password = "{{placement_pass}}"
   placement_database: |
-      connection = mysql+pymysql://placement:password@controller/placement
+      connection = "mysql+pymysql://placement:{{placement_db_pass}}@{{controller_hostname}}/placement"
 ```
-a more modular way is to place the filename within the variable definition, allowing it to acquire both the blocks and file in an orderly fashion, reducing the written code within the module.
+note: a more modular way is to place the filename within the variable definition, allowing it to acquire both the blocks and file in an orderly fashion, reducing the written code within the module.
 
 #### Auxiliary roles:
 These roles are repeated tasks that are shared across components, I've placed them within their respective roles.

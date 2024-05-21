@@ -23,12 +23,12 @@
     name: create_service
   vars:
     username: nova
-    userpassword: servicepassword
+    userpassword: "{{nova_pass}}"
     projectname: service
     servicename: nova
     servicetype: compute
     servicedescription: "Openstack Nova Service"
-    endpointurl: "http://controller:8774/v2.1"
+    endpointurl: "http://{{controller_hostname}}:8774/v2.1"
     serviceregion: "RegionOne"
 - name: "Configure the nova mysql database tables"
   become: yes
